@@ -1,0 +1,36 @@
+#Install needed dependencies
+sudo apt-get -y install git autoconf build-essential
+sudo apt-get -y install gperf bison flex texinfo libtool libncurses5-dev wget gawk libc6-dev-amd64 python-serial libexpat-dev dpkg-dev unzip
+
+# Install the esp-open-sdk toolchain
+cd /opt
+sudo git clone https://github.com/pfalcon/esp-open-sdk.git
+sudo chown -R jpenninkhof esp-open-sdk
+cd esp-open-sdk
+make STANDALONE=y
+echo 'PATH=$PATH:/opt/esp-open-sdk/xtensa-lx106-elf/bin' >> ~/.profile
+echo 'PATH=$PATH:/opt/esp-open-sdk/esptool' >> ~/.profile
+PATH=$PATH:/opt/esp-open-sdk/xtensa-lx106-elf/bin
+PATH=$PATH:/opt/esp-open-sdk/esptool
+
+# Installing the ESP image tool
+cd /opt/esp-open-sdk
+wget -O esptool_0.0.2-1_i386.deb https://github.com/esp8266/esp8266-wiki/raw/master/deb/esptool_0.0.2-1_i386.deb
+sudo dpkg -i esptool_0.0.2-1_i386.deb
+rm esptool_0.0.2-1_i386.deb
+
+
+Updating
+/opt/esp-open-sdk
+make clean
+git pull
+git submodule update
+
+
+Run Blinky
+git clone https://github.com/esp8266/source-code-examples.git
+cd source-code-examples/blinky
+sed -i 's/Espressif\/crosstool-NG\/builds\/xtensa-lx106-elf\/bin/esp-open-sdk\/xtensa-lx106-elf\/bin/g' Makefile
+sed -i 's/Espressif\/ESP8266_SDK/esp-open-sdk\/sdk/g' Makefile
+sed -i 's/Espressif/esp-open-sdk/g' Makefile
+make
